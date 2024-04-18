@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.barracuda.barracudateacher.class_info.mapper.UserClassRelationMapper">
+    
+    <resultMap type="UserClassRelation" id="UserClassRelationResult">
+        <result property="sysUserId"    column="sys_user_id"    />
+        <result property="tbClassInfoId"    column="tb_class_info_id"    />
+    </resultMap>
+
+    <sql id="selectUserClassRelationVo">
+        select sys_user_id, tb_class_info_id from rt_user_class
+    </sql>
+
+    <select id="selectUserClassRelationList" parameterType="UserClassRelation" resultMap="UserClassRelationResult">
+        <include refid="selectUserClassRelationVo"/>
+        <where>  
+            <if test="sysUserId != null "> and sys_user_id = #{sysUserId}</if>
+            <if test="tbClassInfoId != null "> and tb_class_info_id = #{tbClassInfoId}</if>
+        </where>
+    </select>
+    
+    <select id="selectUserClassRelationBySysUserId" parameterType="Long" resultMap="UserClassRelationResult">
+        <include refid="selectUserClassRelationVo"/>
+        where sys_user_id = #{sysUserId}
+    </select>
+        
+    <insert id="insertUserClassRelation" parameterType="UserClassRelation">
+        insert into rt_user_class
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="sysUserId != null">sys_user_id,</if>
+            <if test="tbClassInfoId != null">tb_class_info_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="sysUserId != null">#{sysUserId},</if>
+            <if test="tbClassInfoId != null">#{tbClassInfoId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateUserClassRelation" parameterType="UserClassRelation">
+        update rt_user_class
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tbClassInfoId != null">tb_class_info_id = #{tbClassInfoId},</if>
+        </trim>
+        where sys_user_id = #{sysUserId}
+    </update>
+
+    <delete id="deleteUserClassRelationBySysUserId" parameterType="Long">
+        delete from rt_user_class where sys_user_id = #{sysUserId}
+    </delete>
+
+    <delete id="deleteUserClassRelationBySysUserIds" parameterType="String">
+        delete from rt_user_class where sys_user_id in 
+        <foreach item="sysUserId" collection="array" open="(" separator="," close=")">
+            #{sysUserId}
+        </foreach>
+    </delete>
+
+</mapper>

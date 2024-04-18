@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.barracuda.barracudateacher.student_info.mapper.ClassStudentRelationMapper">
+    
+    <resultMap type="ClassStudentRelation" id="ClassStudentRelationResult">
+        <result property="tbStudentInfoId"    column="tb_student_info_id"    />
+        <result property="tbClassInfoId"    column="tb_class_info_id"    />
+    </resultMap>
+
+    <sql id="selectClassStudentRelationVo">
+        select tb_student_info_id, tb_class_info_id from rt_class_student
+    </sql>
+
+    <select id="selectClassStudentRelationList" parameterType="ClassStudentRelation" resultMap="ClassStudentRelationResult">
+        <include refid="selectClassStudentRelationVo"/>
+        <where>  
+            <if test="tbStudentInfoId != null "> and tb_student_info_id = #{tbStudentInfoId}</if>
+            <if test="tbClassInfoId != null "> and tb_class_info_id = #{tbClassInfoId}</if>
+        </where>
+    </select>
+    
+    <select id="selectClassStudentRelationByTbStudentInfoId" parameterType="Long" resultMap="ClassStudentRelationResult">
+        <include refid="selectClassStudentRelationVo"/>
+        where tb_student_info_id = #{tbStudentInfoId}
+    </select>
+        
+    <insert id="insertClassStudentRelation" parameterType="ClassStudentRelation">
+        insert into rt_class_student
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="tbStudentInfoId != null">tb_student_info_id,</if>
+            <if test="tbClassInfoId != null">tb_class_info_id,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="tbStudentInfoId != null">#{tbStudentInfoId},</if>
+            <if test="tbClassInfoId != null">#{tbClassInfoId},</if>
+         </trim>
+    </insert>
+
+    <update id="updateClassStudentRelation" parameterType="ClassStudentRelation">
+        update rt_class_student
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="tbClassInfoId != null">tb_class_info_id = #{tbClassInfoId},</if>
+        </trim>
+        where tb_student_info_id = #{tbStudentInfoId}
+    </update>
+
+    <delete id="deleteClassStudentRelationByTbStudentInfoId" parameterType="Long">
+        delete from rt_class_student where tb_student_info_id = #{tbStudentInfoId}
+    </delete>
+
+    <delete id="deleteClassStudentRelationByTbStudentInfoIds" parameterType="String">
+        delete from rt_class_student where tb_student_info_id in 
+        <foreach item="tbStudentInfoId" collection="array" open="(" separator="," close=")">
+            #{tbStudentInfoId}
+        </foreach>
+    </delete>
+
+</mapper>
