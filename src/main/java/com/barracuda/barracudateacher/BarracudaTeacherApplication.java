@@ -18,7 +18,7 @@ public class BarracudaTeacherApplication {
         ConfigurableEnvironment environment = context.getEnvironment();
         String serverPort = environment.getProperty("server.port");
         String serverServletContextPath = environment.getProperty("server.servlet.context-path");
-        log.info(" (♥◠‿◠)ﾉﾞ  BarracudaTeacher启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
+        log.info("(♥◠‿◠)ﾉﾞ  BarracudaTeacher启动成功   ლ(´ڡ`ლ)ﾞ  \n" +
                 "http://localhost:{}{}", serverPort, serverServletContextPath);
     }
 

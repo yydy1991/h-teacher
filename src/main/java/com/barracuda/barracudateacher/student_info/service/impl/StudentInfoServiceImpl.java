@@ -1,25 +1,36 @@
 package com.barracuda.barracudateacher.student_info.service.impl;
 
-import com.barracuda.barracudateacher.student_info.domain.StudentInfo;
-import com.barracuda.barracudateacher.student_info.mapper.StudentInfoMapper;
-import com.barracuda.barracudateacher.student_info.service.IStudentInfoService;
+import java.util.List;
+
+import com.barracuda.barracudateacher.student_info.domain.ClassStudentRelation;
+import com.barracuda.barracudateacher.student_info.service.IClassStudentRelationService;
 import com.barracuda.barracudateacher.tool.UserTool;
-import com.barracuda.common.core.text.Convert;
 import com.barracuda.common.utils.DateUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import com.barracuda.barracudateacher.student_info.mapper.StudentInfoMapper;
+import com.barracuda.barracudateacher.student_info.domain.StudentInfo;
+import com.barracuda.barracudateacher.student_info.service.IStudentInfoService;
+import com.barracuda.common.core.text.Convert;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
-import java.util.List;
 
 /**
  * 学生信息Service业务层处理
  *
  * @author barracuda
  */
+@Slf4j
 @Service
 public class StudentInfoServiceImpl implements IStudentInfoService {
     @Resource
     private StudentInfoMapper studentInfoMapper;
+
+    @Resource
+    private IClassStudentRelationService classStudentRelationService;
 
     /**
      * 查询学生信息
@@ -89,5 +100,54 @@ public class StudentInfoServiceImpl implements IStudentInfoService {
     @Override
     public int deleteStudentInfoById(Long id) {
         return studentInfoMapper.deleteStudentInfoById(id);
+    }
+
+    /**
+     * 查询班级内的学生信息
+     *
+     * @param studentInfo 学生信息
+     * @param classId     班级主键
+     * @return 学生信息列表
+     */
+    @Override
+    public List<StudentInfo> listStudentInfoOfClassId(StudentInfo studentInfo, Long classId) {
+        return studentInfoMapper.listStudentInfoOfClassId(studentInfo, classId);
+    }
+
+    @Override
+    public int insertStudentInfo(StudentInfo studentInfo, Long classId) {
+        int i = insertStudentInfo(studentInfo);
+        if (classId != null) {
+            ClassStudentRelation relation = new ClassStudentRelation();
+            relation.setTbClassInfoId(classId);
+            relation.setTbStudentInfoId(studentInfo.getId());
+            classStudentRelationService.insertClassStudentRelation(relation);
+        }
+        return i;
+    }
+
+    /**
+     * 导入学生信息
+     *
+     * @param studentInfoList 学生信息
+     * @param classId         班级主键
+     * @return
+     */
+    @Override
+    public String importStudent(List<StudentInfo> studentInfoList, Long classId) {
+        Assert.notNull(classId, "没有班级信息");
+        String result = "导入成功！";
+        try {
+            if (!CollectionUtils.isEmpty(studentInfoList)) {
+                for (StudentInfo studentInfo : studentInfoList) {
+                    insertStudentInfo(studentInfo, classId);
+                }
+            }
+        } catch (Exception e) {
+            result = "导入失败！";
+            log.error("导入失败。" + e.getMessage(), e);
+        }
+
+        return result;
     }
 }

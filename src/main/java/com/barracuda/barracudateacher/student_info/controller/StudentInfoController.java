@@ -4,6 +4,7 @@ import com.barracuda.barracudateacher.class_info.domain.ClassInfo;
 import com.barracuda.barracudateacher.class_info.service.IClassInfoService;
 import com.barracuda.barracudateacher.student_info.domain.StudentInfo;
 import com.barracuda.barracudateacher.student_info.service.IStudentInfoService;
+import com.barracuda.barracudateacher.tool.UserTool;
 import com.barracuda.common.annotation.Log;
 import com.barracuda.common.core.controller.BaseController;
 import com.barracuda.common.core.domain.AjaxResult;
@@ -11,10 +12,12 @@ import com.barracuda.common.core.domain.Ztree;
 import com.barracuda.common.core.page.TableDataInfo;
 import com.barracuda.common.enums.BusinessType;
 import com.barracuda.common.utils.poi.ExcelUtil;
+import com.barracuda.web.controller.demo.domain.UserOperateModel;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -28,7 +31,6 @@ import java.util.List;
 @Controller
 @RequestMapping("/studentinfo/studentinfo")
 public class StudentInfoController extends BaseController {
-    private String prefix = "studentinfo/studentinfo";
 
     @Resource
     private IStudentInfoService studentInfoService;
@@ -39,7 +41,7 @@ public class StudentInfoController extends BaseController {
     @RequiresPermissions("studentinfo:studentinfo:view")
     @GetMapping()
     public String studentinfo() {
-        return prefix + "/studentinfo";
+        return "studentinfo/studentinfo/studentinfo";
     }
 
     /**
@@ -48,9 +50,9 @@ public class StudentInfoController extends BaseController {
     @RequiresPermissions("studentinfo:studentinfo:list")
     @PostMapping("/list")
     @ResponseBody
-    public TableDataInfo list(StudentInfo studentInfo) {
+    public TableDataInfo list(StudentInfo studentInfo, Long classId) {
         startPage();
-        List<StudentInfo> list = studentInfoService.selectStudentInfoList(studentInfo);
+        List<StudentInfo> list = studentInfoService.listStudentInfoOfClassId(studentInfo, classId);
         return getDataTable(list);
     }
 
@@ -61,8 +63,8 @@ public class StudentInfoController extends BaseController {
     @Log(title = "学生信息", businessType = BusinessType.EXPORT)
     @PostMapping("/export")
     @ResponseBody
-    public AjaxResult export(StudentInfo studentInfo) {
-        List<StudentInfo> list = studentInfoService.selectStudentInfoList(studentInfo);
+    public AjaxResult export(StudentInfo studentInfo, Long classId) {
+        List<StudentInfo> list = studentInfoService.listStudentInfoOfClassId(studentInfo, classId);
         ExcelUtil<StudentInfo> util = new ExcelUtil<>(StudentInfo.class);
         return util.exportExcel(list, "学生信息数据");
     }
@@ -71,8 +73,9 @@ public class StudentInfoController extends BaseController {
      * 新增学生信息
      */
     @GetMapping("/add")
-    public String add() {
-        return prefix + "/add";
+    public String add(Long classId, ModelMap modelMap) {
+        modelMap.put("classId", classId);
+        return "studentinfo/studentinfo/add";
     }
 
     /**
@@ -82,8 +85,9 @@ public class StudentInfoController extends BaseController {
     @Log(title = "学生信息", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(StudentInfo studentInfo) {
-        return toAjax(studentInfoService.insertStudentInfo(studentInfo));
+    public AjaxResult addSave(StudentInfo studentInfo, Long classId) {
+        int i = studentInfoService.insertStudentInfo(studentInfo, classId);
+        return toAjax(i);
     }
 
     /**
@@ -94,7 +98,7 @@ public class StudentInfoController extends BaseController {
     public String edit(@PathVariable("id") Long id, ModelMap mmap) {
         StudentInfo studentInfo = studentInfoService.selectStudentInfoById(id);
         mmap.put("studentInfo", studentInfo);
-        return prefix + "/edit";
+        return "studentinfo/studentinfo/edit";
     }
 
     /**
@@ -128,5 +132,28 @@ public class StudentInfoController extends BaseController {
     @ResponseBody
     public List<Ztree> classTreeData() {
         return classInfoService.selectClassTree(new ClassInfo());
+    }
+
+    /**
+     * 下载模板
+     */
+    @GetMapping("/importTemplate")
+    @ResponseBody
+    public AjaxResult importTemplate() {
+        ExcelUtil<StudentInfo> util = new ExcelUtil<>(StudentInfo.class);
+        return util.importTemplateExcel("学生信息");
+    }
+
+
+    /**
+     * 导入数据
+     */
+    @PostMapping("/importData")
+    @ResponseBody
+    public AjaxResult importData(MultipartFile file, Long classId) throws Exception {
+        ExcelUtil<StudentInfo> util = new ExcelUtil<>(StudentInfo.class);
+        List<StudentInfo> studentInfoList = util.importExcel(file.getInputStream());
+        String message = studentInfoService.importStudent(studentInfoList, classId);
+        return AjaxResult.success(message);
     }
 }

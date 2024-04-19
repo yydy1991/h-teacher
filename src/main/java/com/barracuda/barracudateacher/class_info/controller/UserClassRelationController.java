@@ -60,6 +60,7 @@ public class UserClassRelationController extends BaseController {
         ExcelUtil<UserClassRelation> util = new ExcelUtil<>(UserClassRelation.class);
         return util.exportExcel(list, "教师和班级关系数据");
     }
+
     /**
      * 新增教师和班级关系
      */

@@ -1,9 +1,9 @@
 package com.barracuda.barracudateacher.class_info.domain;
 
+import com.barracuda.barracudateacher.base.entity.TBaseEntity;
+import com.barracuda.common.annotation.Excel;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
-import com.barracuda.common.annotation.Excel;
-import com.barracuda.common.core.domain.BaseEntity;
 
 /**
  * 班级信息对象 tb_class_info
@@ -11,18 +11,13 @@ import com.barracuda.common.core.domain.BaseEntity;
  * @author barracuda
  * @date 2024-03-04
  */
-public class ClassInfo extends BaseEntity {
+public class ClassInfo extends TBaseEntity {
     private static final long serialVersionUID = 1L;
 
     /**
      * 主键
      */
     private Long id;
-
-    /**
-     * 删除标识 0=未删除,1=已删除
-     */
-    private Long delFlag;
 
     /**
      * 班级名称
@@ -36,14 +31,6 @@ public class ClassInfo extends BaseEntity {
 
     public Long getId() {
         return id;
-    }
-
-    public void setDelFlag(Long delFlag) {
-        this.delFlag = delFlag;
-    }
-
-    public Long getDelFlag() {
-        return delFlag;
     }
 
     public void setClassName(String className) {
