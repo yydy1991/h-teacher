@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.barracuda.barracudateacher.reference.mapper.DocumentMapper">
+    
+    <resultMap type="Document" id="DocumentResult">
+        <result property="id"    column="id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+        <result property="documentType"    column="document_type"    />
+        <result property="documentSize"    column="document_size"    />
+        <result property="documentAddress"    column="document_address"    />
+        <result property="documentName"    column="document_name"    />
+    </resultMap>
+
+    <sql id="selectDocumentVo">
+        select id,
+               create_by,
+               create_time,
+               update_by,
+               update_time,
+               del_flag,
+               remark,
+               document_type,
+               document_size,
+               document_address,
+               document_name
+        from ref_document
+    </sql>
+
+    <select id="selectDocumentList" parameterType="Document" resultMap="DocumentResult">
+        <include refid="selectDocumentVo"/>
+        <where>  
+            <if test="documentType != null  and documentType != ''"> and document_type = #{documentType}</if>
+            <if test="documentSize != null "> and document_size = #{documentSize}</if>
+            <if test="documentAddress != null  and documentAddress != ''"> and document_address = #{documentAddress}</if>
+            <if test="documentName != null  and documentName != ''"> and document_name = #{documentName}</if>
+        </where>
+    </select>
+    
+    <select id="selectDocumentById" parameterType="Long" resultMap="DocumentResult">
+        <include refid="selectDocumentVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertDocument" parameterType="Document" useGeneratedKeys="true" keyProperty="id">
+        insert into ref_document
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+            <if test="documentType != null">document_type,</if>
+            <if test="documentSize != null">document_size,</if>
+            <if test="documentAddress != null">document_address,</if>
+            <if test="documentName != null">document_name,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="documentType != null">#{documentType},</if>
+            <if test="documentSize != null">#{documentSize},</if>
+            <if test="documentAddress != null">#{documentAddress},</if>
+            <if test="documentName != null">#{documentName},</if>
+         </trim>
+    </insert>
+
+    <update id="updateDocument" parameterType="Document">
+        update ref_document
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="documentType != null">document_type = #{documentType},</if>
+            <if test="documentSize != null">document_size = #{documentSize},</if>
+            <if test="documentAddress != null">document_address = #{documentAddress},</if>
+            <if test="documentName != null">document_name = #{documentName},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteDocumentById" parameterType="Long">
+        delete from ref_document where id = #{id}
+    </delete>
+
+    <delete id="deleteDocumentByIds" parameterType="String">
+        delete from ref_document where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>

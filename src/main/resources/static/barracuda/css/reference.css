@@ -1,0 +1,11 @@
+.note-editing-area {
+    height: 60vh;
+}
+
+.note-editable {
+    height: 60vh;
+}
+
+.kv-file-upload {
+    display: none;
+}

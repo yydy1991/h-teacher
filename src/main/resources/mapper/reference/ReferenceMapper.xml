@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.barracuda.barracudateacher.reference.mapper.ReferenceMapper">
+    
+    <resultMap type="Reference" id="ReferenceResult">
+        <result property="id"    column="id"    />
+        <result property="createBy"    column="create_by"    />
+        <result property="createTime"    column="create_time"    />
+        <result property="updateBy"    column="update_by"    />
+        <result property="updateTime"    column="update_time"    />
+        <result property="delFlag"    column="del_flag"    />
+        <result property="remark"    column="remark"    />
+        <result property="referenceType"    column="reference_type"    />
+        <result property="referenceContent"    column="reference_content"    />
+        <result property="referenceTitle"    column="reference_title"    />
+        <result property="referenceTag"    column="reference_tag"    />
+    </resultMap>
+
+    <sql id="selectReferenceVo">
+        select id, create_by, create_time, update_by, update_time, del_flag, remark, reference_type, reference_content, reference_title, reference_tag from ref_reference
+    </sql>
+
+    <select id="selectReferenceList" parameterType="Reference" resultMap="ReferenceResult">
+        <include refid="selectReferenceVo"/>
+        <where>  
+            <if test="referenceType != null  and referenceType != ''"> and reference_type = #{referenceType}</if>
+            <if test="referenceContent != null  and referenceContent != ''"> and reference_content = #{referenceContent}</if>
+            <if test="referenceTitle != null  and referenceTitle != ''"> and reference_title = #{referenceTitle}</if>
+            <if test="referenceTag != null  and referenceTag != ''"> and reference_tag = #{referenceTag}</if>
+        </where>
+    </select>
+    
+    <select id="selectReferenceById" parameterType="Long" resultMap="ReferenceResult">
+        <include refid="selectReferenceVo"/>
+        where id = #{id}
+    </select>
+        
+    <insert id="insertReference" parameterType="Reference" useGeneratedKeys="true" keyProperty="id">
+        insert into ref_reference
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="createBy != null">create_by,</if>
+            <if test="createTime != null">create_time,</if>
+            <if test="updateBy != null">update_by,</if>
+            <if test="updateTime != null">update_time,</if>
+            <if test="delFlag != null">del_flag,</if>
+            <if test="remark != null">remark,</if>
+            <if test="referenceType != null">reference_type,</if>
+            <if test="referenceContent != null">reference_content,</if>
+            <if test="referenceTitle != null">reference_title,</if>
+            <if test="referenceTag != null">reference_tag,</if>
+         </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="createBy != null">#{createBy},</if>
+            <if test="createTime != null">#{createTime},</if>
+            <if test="updateBy != null">#{updateBy},</if>
+            <if test="updateTime != null">#{updateTime},</if>
+            <if test="delFlag != null">#{delFlag},</if>
+            <if test="remark != null">#{remark},</if>
+            <if test="referenceType != null">#{referenceType},</if>
+            <if test="referenceContent != null">#{referenceContent},</if>
+            <if test="referenceTitle != null">#{referenceTitle},</if>
+            <if test="referenceTag != null">#{referenceTag},</if>
+         </trim>
+    </insert>
+
+    <update id="updateReference" parameterType="Reference">
+        update ref_reference
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="createBy != null">create_by = #{createBy},</if>
+            <if test="createTime != null">create_time = #{createTime},</if>
+            <if test="updateBy != null">update_by = #{updateBy},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="delFlag != null">del_flag = #{delFlag},</if>
+            <if test="remark != null">remark = #{remark},</if>
+            <if test="referenceType != null">reference_type = #{referenceType},</if>
+            <if test="referenceContent != null">reference_content = #{referenceContent},</if>
+            <if test="referenceTitle != null">reference_title = #{referenceTitle},</if>
+            <if test="referenceTag != null">reference_tag = #{referenceTag},</if>
+        </trim>
+        where id = #{id}
+    </update>
+
+    <delete id="deleteReferenceById" parameterType="Long">
+        delete from ref_reference where id = #{id}
+    </delete>
+
+    <delete id="deleteReferenceByIds" parameterType="String">
+        delete from ref_reference where id in 
+        <foreach item="id" collection="array" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
+
+</mapper>
