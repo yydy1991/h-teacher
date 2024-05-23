@@ -1,0 +1,26 @@
+.file-pocket-container {
+    border: 1px solid #e5e6e7;
+    border-radius: 5px;
+}
+
+.file-drop-area {
+    z-index: 2;
+    height: 100%;
+    width: 100%;
+    float: left;
+    display: flex;
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+}
+
+.file-display-area {
+    z-index: 1;
+    position: absolute;
+    width: 100%;
+    height: 100%;
+}
+
+.delete-file-btn {
+    cursor: pointer;
+    color: red;
+}

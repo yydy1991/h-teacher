@@ -58,4 +58,11 @@ public interface DocumentMapper
      * @return 结果
      */
     public int deleteDocumentByIds(String[] ids);
+
+    /**
+     * 查询附件
+     *
+     * @param referenceId 参考资料ID
+     */
+    List<Document> listByReferenceId(Long referenceId);
 }

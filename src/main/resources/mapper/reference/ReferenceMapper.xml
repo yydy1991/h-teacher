@@ -27,7 +27,7 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         <where>  
             <if test="referenceType != null  and referenceType != ''"> and reference_type = #{referenceType}</if>
             <if test="referenceContent != null  and referenceContent != ''"> and reference_content = #{referenceContent}</if>
-            <if test="referenceTitle != null  and referenceTitle != ''"> and reference_title = #{referenceTitle}</if>
+            <if test="referenceTitle != null  and referenceTitle != ''"> and reference_title like concat('%', #{referenceTitle}, '%')</if>
             <if test="referenceTag != null  and referenceTag != ''"> and reference_tag = #{referenceTag}</if>
         </where>
     </select>

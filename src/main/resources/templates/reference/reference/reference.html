@@ -14,10 +14,10 @@
                             <label>资料标题：</label>
                             <input type="text" name="referenceTitle"/>
                         </li>
-                        <li>
+                        <!--<li>
                             <label>资料标签：</label>
                             <input type="text" name="referenceTag"/>
-                        </li>
+                        </li>-->
                         <li>
                             <a class="btn btn-primary btn-rounded btn-sm" onclick="$.table.search()"><i
                                     class="fa fa-search"></i>&nbsp;搜索</a>
@@ -77,6 +77,22 @@
                 {
                     field: 'referenceTitle',
                     title: '资料标题'
+                },
+                {
+                    field: 'createBy',
+                    title: '创建人'
+                },
+                {
+                    field: 'createTime',
+                    title: '创建时间'
+                },
+                {
+                    field: 'updateBy',
+                    title: '修改人'
+                },
+                {
+                    field: 'updateTime',
+                    title: '修改时间'
                 },
                /* {
                     field: 'referenceTag',

@@ -3,6 +3,7 @@ package com.barracuda.barracudateacher.reference.service.impl;
 import com.barracuda.barracudateacher.reference.domain.Reference;
 import com.barracuda.barracudateacher.reference.mapper.ReferenceMapper;
 import com.barracuda.barracudateacher.reference.service.IReferenceService;
+import com.barracuda.barracudateacher.tool.UserTool;
 import com.barracuda.common.core.text.Convert;
 import com.barracuda.common.utils.DateUtils;
 import org.springframework.stereotype.Service;
@@ -50,6 +51,7 @@ public class ReferenceServiceImpl implements IReferenceService {
      */
     @Override
     public int insertReference(Reference reference) {
+        reference.setCreateBy(UserTool.getCurrentUserLoginName());
         reference.setCreateTime(DateUtils.getNowDate());
         return referenceMapper.insertReference(reference);
     }
@@ -62,6 +64,7 @@ public class ReferenceServiceImpl implements IReferenceService {
      */
     @Override
     public int updateReference(Reference reference) {
+        reference.setUpdateBy(UserTool.getCurrentUserLoginName());
         reference.setUpdateTime(DateUtils.getNowDate());
         return referenceMapper.updateReference(reference);
     }

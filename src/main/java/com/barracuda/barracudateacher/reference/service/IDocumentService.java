@@ -66,4 +66,11 @@ public interface IDocumentService {
      * @return 文档
      */
     List<Document> insertDocument(List<MultipartFile> files);
+
+    /**
+     * 查询附件
+     *
+     * @param referenceId 参考资料ID
+     */
+    List<Document> listByReferenceId(Long referenceId);
 }

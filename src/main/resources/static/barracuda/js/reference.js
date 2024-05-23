@@ -5,6 +5,7 @@ function initSummernoteOfAddPage() {
     $('.summernote').summernote({
         lang: 'zh-CN',
         dialogsInBody: true,
+        disableDragAndDrop: true,
         callbacks: {
             onChange: function (contents, $edittable) {
                 $("input[name='" + this.id + "']").val(contents);
@@ -43,6 +44,7 @@ function initSummernoteOfEditPage() {
         $('#' + this.id).summernote({
             lang: 'zh-CN',
             dialogsInBody: true,
+            disableDragAndDrop: true,
             callbacks: {
                 onChange: function (contents, $edittable) {
                     $("input[name='" + this.id + "']").val(contents);
@@ -75,14 +77,5 @@ function initSummernoteOfEditPage() {
         });
         var content = $("input[name='" + this.id + "']").val();
         $('#' + this.id).summernote('code', content);
-    })
-}
-
-function initFileInput() {
-    // 多图上传
-    $("#multipleFile").fileinput({
-        uploadUrl: ctx + 'common/uploads',
-        uploadAsync: false,
-        showUpload: false,
     })
 }

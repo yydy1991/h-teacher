@@ -4,12 +4,15 @@ import com.barracuda.barracudateacher.reference.domain.ReferenceDocumentRelation
 import com.barracuda.barracudateacher.reference.mapper.ReferenceDocumentRelationMapper;
 import com.barracuda.barracudateacher.reference.service.IReferenceDocumentRelationService;
 import com.barracuda.common.core.text.Convert;
-import org.apache.shiro.util.Assert;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * 参考资料和文档关系Service业务层处理
@@ -97,5 +100,28 @@ public class ReferenceDocumentRelationServiceImpl implements IReferenceDocumentR
                 insertReferenceDocumentRelation(relation);
             }
         }
+    }
+
+    /**
+     * 更新最新的关系
+     *
+     * @param referenceId 资料ID
+     * @param documentIds 附件IDs
+     */
+    @Override
+    public void updateNewestRelation(Long referenceId, Long[] documentIds) {
+        Assert.notNull(referenceId, "referenceId is null.");
+        deleteReferenceDocumentRelationByRefReferenceId(referenceId);
+        if (documentIds != null && documentIds.length > 0) {
+            insertReferenceDocumentRelation(referenceId, Arrays.asList(documentIds));
+        }
+    }
+
+    @Override
+    public List<ReferenceDocumentRelation> listRelation(Long referenceId) {
+        Assert.notNull(referenceId, "referenceId is null.");
+        ReferenceDocumentRelation relation = new ReferenceDocumentRelation();
+        relation.setRefReferenceId(referenceId);
+        return selectReferenceDocumentRelationList(relation);
     }
 }

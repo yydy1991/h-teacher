@@ -33,6 +33,8 @@ public class ReferenceDocumentRelation extends BaseEntity {
         this.refReferenceId = refReferenceId;
         this.refDocumentId = refDocumentId;
     }
+    public ReferenceDocumentRelation() {
+    }
 
     @Override
     public String toString() {

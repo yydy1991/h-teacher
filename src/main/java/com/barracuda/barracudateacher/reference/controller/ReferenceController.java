@@ -12,6 +12,7 @@ import com.barracuda.common.core.domain.AjaxResult;
 import com.barracuda.common.core.page.TableDataInfo;
 import com.barracuda.common.enums.BusinessType;
 import com.barracuda.common.utils.poi.ExcelUtil;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
@@ -19,6 +20,8 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -86,11 +89,12 @@ public class ReferenceController extends BaseController {
     @Log(title = "参考资料", businessType = BusinessType.INSERT)
     @PostMapping("/add")
     @ResponseBody
-    public AjaxResult addSave(Reference reference, List<MultipartFile> files) {
+    public AjaxResult addSave(Reference reference, Long[] documentIds) {
         referenceService.insertReference(reference);
-        List<Document> documentList = documentService.insertDocument(files);
-        List<Long> documentIdList = documentList.stream().map(Document::getId).collect(Collectors.toList());
-        referenceDocumentRelationService.insertReferenceDocumentRelation(reference.getId(), documentIdList);
+        if (documentIds != null && documentIds.length > 0) {
+            List<Long> list = Arrays.asList(documentIds);
+            referenceDocumentRelationService.insertReferenceDocumentRelation(reference.getId(), list);
+        }
         return AjaxResult.success();
     }
 
@@ -101,6 +105,16 @@ public class ReferenceController extends BaseController {
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable("id") Long id, ModelMap mmap) {
         Reference reference = referenceService.selectReferenceById(id);
+        ReferenceDocumentRelation referenceDocumentRelation = new ReferenceDocumentRelation();
+        referenceDocumentRelation.setRefReferenceId(id);
+        List<ReferenceDocumentRelation> referenceDocumentRelations = referenceDocumentRelationService.selectReferenceDocumentRelationList(referenceDocumentRelation);
+        List<Document> documents = new ArrayList<>();
+        for (ReferenceDocumentRelation documentRelation : referenceDocumentRelations) {
+            Long documentId = documentRelation.getRefDocumentId();
+            Document document = documentService.selectDocumentById(documentId);
+            documents.add(document);
+        }
+        mmap.put("documents", documents);
         mmap.put("reference", reference);
         return "reference/reference/edit";
     }
@@ -112,8 +126,10 @@ public class ReferenceController extends BaseController {
     @Log(title = "参考资料", businessType = BusinessType.UPDATE)
     @PostMapping("/edit")
     @ResponseBody
-    public AjaxResult editSave(Reference reference) {
-        return toAjax(referenceService.updateReference(reference));
+    public AjaxResult editSave(Reference reference, Long[] documentIds) {
+        int i = referenceService.updateReference(reference);
+        referenceDocumentRelationService.updateNewestRelation(reference.getId(), documentIds);
+        return toAjax(i);
     }
 
     /**

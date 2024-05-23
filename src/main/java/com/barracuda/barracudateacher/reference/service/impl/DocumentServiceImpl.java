@@ -11,6 +11,7 @@ import com.barracuda.common.utils.file.FileUploadUtils;
 import com.barracuda.common.utils.file.FileUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
@@ -134,5 +135,17 @@ public class DocumentServiceImpl implements IDocumentService {
             log.error("insertDocument error." + e.getMessage(), e);
         }
         return result;
+    }
+
+
+    /**
+     * 查询附件
+     *
+     * @param referenceId 参考资料ID
+     */
+    @Override
+    public List<Document> listByReferenceId(Long referenceId) {
+        Assert.notNull(referenceId, "Reference id is null.");
+        return documentMapper.listByReferenceId(referenceId);
     }
 }

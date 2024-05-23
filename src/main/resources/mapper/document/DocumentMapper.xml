@@ -104,4 +104,9 @@ PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         </foreach>
     </delete>
 
+    <select id="listByReferenceId" parameterType="Long" resultMap="DocumentResult">
+        <include refid="selectDocumentVo"/>
+        left join rt_reference_document t on t.ref_document_id = ref_document.id
+        where t.ref_reference_id = ${_paramter}
+    </select>
 </mapper>
