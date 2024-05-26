@@ -58,4 +58,6 @@ public interface ReferenceMapper
      * @return 结果
      */
     public int deleteReferenceByIds(String[] ids);
+
+    List<Reference> listAllInfo(Reference reference);
 }

@@ -46,6 +46,16 @@ public class Reference extends TBaseEntity {
     @Excel(name = "资料标签")
     private String referenceTag;
 
+    /**
+     * 学科ID
+     */
+    private Long subjectId;
+
+    /**
+     * 年级ID
+     */
+    private Long gradeId;
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)

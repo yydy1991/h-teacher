@@ -3,27 +3,22 @@ package com.barracuda.barracudateacher.reference.controller;
 import com.barracuda.barracudateacher.reference.domain.Document;
 import com.barracuda.barracudateacher.reference.domain.Reference;
 import com.barracuda.barracudateacher.reference.domain.ReferenceDocumentRelation;
-import com.barracuda.barracudateacher.reference.service.IDocumentService;
-import com.barracuda.barracudateacher.reference.service.IReferenceDocumentRelationService;
-import com.barracuda.barracudateacher.reference.service.IReferenceService;
+import com.barracuda.barracudateacher.reference.service.*;
 import com.barracuda.common.annotation.Log;
 import com.barracuda.common.core.controller.BaseController;
 import com.barracuda.common.core.domain.AjaxResult;
 import com.barracuda.common.core.page.TableDataInfo;
 import com.barracuda.common.enums.BusinessType;
 import com.barracuda.common.utils.poi.ExcelUtil;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * 参考资料Controller
@@ -43,6 +38,11 @@ public class ReferenceController extends BaseController {
     @Resource
     private IReferenceDocumentRelationService referenceDocumentRelationService;
 
+    @Resource
+    private IReferenceSubjectRelationService referenceSubjectRelationService;
+    @Resource
+    private IReferenceGradeRelationService referenceGradeRelationService;
+
     @RequiresPermissions("reference:reference:view")
     @GetMapping()
     public String reference() {
@@ -57,7 +57,7 @@ public class ReferenceController extends BaseController {
     @ResponseBody
     public TableDataInfo list(Reference reference) {
         startPage();
-        List<Reference> list = referenceService.selectReferenceList(reference);
+        List<Reference> list = referenceService.listAllInfo(reference);
         return getDataTable(list);
     }
 
@@ -104,7 +104,9 @@ public class ReferenceController extends BaseController {
     @RequiresPermissions("reference:reference:edit")
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable("id") Long id, ModelMap mmap) {
-        Reference reference = referenceService.selectReferenceById(id);
+        Reference reference = referenceService.getReference(id);
+        referenceService.setProjectId(reference);
+        referenceService.setGradeId(reference);
         ReferenceDocumentRelation referenceDocumentRelation = new ReferenceDocumentRelation();
         referenceDocumentRelation.setRefReferenceId(id);
         List<ReferenceDocumentRelation> referenceDocumentRelations = referenceDocumentRelationService.selectReferenceDocumentRelationList(referenceDocumentRelation);
@@ -129,6 +131,8 @@ public class ReferenceController extends BaseController {
     public AjaxResult editSave(Reference reference, Long[] documentIds) {
         int i = referenceService.updateReference(reference);
         referenceDocumentRelationService.updateNewestRelation(reference.getId(), documentIds);
+        referenceSubjectRelationService.updateNewestRelation(reference.getId(), reference.getSubjectId());
+        referenceGradeRelationService.updateNewestRelation(reference.getId(), reference.getGradeId());
         return toAjax(i);
     }
 

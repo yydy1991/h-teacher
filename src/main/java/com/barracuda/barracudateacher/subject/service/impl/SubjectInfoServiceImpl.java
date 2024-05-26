@@ -16,7 +16,7 @@ import java.util.List;
  * @author barracuda
  * @date 2024-05-24
  */
-@Service
+@Service("subject")
 public class SubjectInfoServiceImpl implements ISubjectInfoService {
     @Resource
     private SubjectInfoMapper subjectInfoMapper;
@@ -87,5 +87,14 @@ public class SubjectInfoServiceImpl implements ISubjectInfoService {
     @Override
     public int deleteSubjectInfoById(Long id) {
         return subjectInfoMapper.deleteSubjectInfoById(id);
+    }
+
+
+    /**
+     * thymeleaf 实现学科读取
+     * subject.list()
+     */
+    public List<SubjectInfo> list() {
+        return selectSubjectInfoList(new SubjectInfo());
     }
 }

@@ -1,12 +1,18 @@
 package com.barracuda.barracudateacher.reference.service.impl;
 
 import com.barracuda.barracudateacher.reference.domain.Reference;
+import com.barracuda.barracudateacher.reference.domain.ReferenceGradeRelation;
+import com.barracuda.barracudateacher.reference.domain.ReferenceSubjectRelation;
 import com.barracuda.barracudateacher.reference.mapper.ReferenceMapper;
+import com.barracuda.barracudateacher.reference.service.IReferenceGradeRelationService;
 import com.barracuda.barracudateacher.reference.service.IReferenceService;
+import com.barracuda.barracudateacher.reference.service.IReferenceSubjectRelationService;
 import com.barracuda.barracudateacher.tool.UserTool;
 import com.barracuda.common.core.text.Convert;
 import com.barracuda.common.utils.DateUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.Assert;
+import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -20,6 +26,12 @@ import java.util.List;
 public class ReferenceServiceImpl implements IReferenceService {
     @Resource
     private ReferenceMapper referenceMapper;
+
+    @Resource
+    private IReferenceSubjectRelationService referenceSubjectRelationService;
+
+    @Resource
+    private IReferenceGradeRelationService referenceGradeRelationService;
 
     /**
      * 查询参考资料
@@ -89,5 +101,44 @@ public class ReferenceServiceImpl implements IReferenceService {
     @Override
     public int deleteReferenceById(Long id) {
         return referenceMapper.deleteReferenceById(id);
+    }
+
+    @Override
+    public Reference getReference(Long id) {
+        return selectReferenceById(id);
+    }
+
+    @Override
+    public void setProjectId(Reference reference) {
+        Assert.notNull(reference, "reference is null");
+        Long id = reference.getId();
+        Assert.notNull(id, "reference id is null");
+        List<ReferenceSubjectRelation> relations = referenceSubjectRelationService.list(id);
+        if (!CollectionUtils.isEmpty(relations)) {
+            Long subjectId = relations.get(0).getSubjectId();
+            reference.setSubjectId(subjectId);
+        }
+    }
+
+    @Override
+    public void setGradeId(Reference reference) {
+        Assert.notNull(reference, "reference is null");
+        Long id = reference.getId();
+        Assert.notNull(id, "reference id is null");
+        List<ReferenceGradeRelation> relations = referenceGradeRelationService.list(id);
+        if (!CollectionUtils.isEmpty(relations)) {
+            Long gradeId = relations.get(0).getGradeId();
+            reference.setGradeId(gradeId);
+        }
+    }
+
+    /**
+     * 查询所有信息
+     *
+     * @param reference
+     */
+    @Override
+    public List<Reference> listAllInfo(Reference reference) {
+        return referenceMapper.listAllInfo(reference);
     }
 }

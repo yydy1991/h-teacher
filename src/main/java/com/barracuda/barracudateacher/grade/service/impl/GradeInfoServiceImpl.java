@@ -16,7 +16,7 @@ import java.util.List;
  * @author barracuda
  * @date 2024-05-24
  */
-@Service
+@Service("grade")
 public class GradeInfoServiceImpl implements IGradeInfoService {
     @Resource
     private GradeInfoMapper gradeInfoMapper;
@@ -87,5 +87,15 @@ public class GradeInfoServiceImpl implements IGradeInfoService {
     @Override
     public int deleteGradeInfoById(Long id) {
         return gradeInfoMapper.deleteGradeInfoById(id);
+    }
+
+    /**
+     * thymeleaf 实现年级读取
+     * grade.list()
+     */
+    @Override
+    public List<GradeInfo> list() {
+        GradeInfo gradeInfo = new GradeInfo();
+        return selectGradeInfoList(gradeInfo);
     }
 }

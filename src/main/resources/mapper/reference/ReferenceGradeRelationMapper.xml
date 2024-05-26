@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.barracuda.barracudateacher.reference.mapper.ReferenceGradeRelationMapper">
+
+    <resultMap type="ReferenceGradeRelation" id="ReferenceGradeRelationResult">
+        <result property="referenceId" column="reference_id"/>
+        <result property="gradeId" column="grade_id"/>
+    </resultMap>
+
+    <sql id="selectReferenceGradeRelationVo">
+        select reference_id, grade_id
+        from rt_reference_grade
+    </sql>
+
+    <select id="selectReferenceGradeRelationList" parameterType="ReferenceGradeRelation"
+            resultMap="ReferenceGradeRelationResult">
+        <include refid="selectReferenceGradeRelationVo"/>
+        <where>
+            <if test="referenceId != null ">and reference_id = #{referenceId}</if>
+            <if test="gradeId != null ">and grade_id = #{gradeId}</if>
+        </where>
+    </select>
+
+    <select id="selectReferenceGradeRelationByReferenceId" parameterType="Long"
+            resultMap="ReferenceGradeRelationResult">
+        <include refid="selectReferenceGradeRelationVo"/>
+        where reference_id = #{referenceId}
+    </select>
+
+    <insert id="insertReferenceGradeRelation" parameterType="ReferenceGradeRelation">
+        insert into rt_reference_grade
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="referenceId != null">reference_id,</if>
+            <if test="gradeId != null">grade_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="referenceId != null">#{referenceId},</if>
+            <if test="gradeId != null">#{gradeId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateReferenceGradeRelation" parameterType="ReferenceGradeRelation">
+        update rt_reference_grade
+        <trim prefix="SET" suffixOverrides=",">
+            grade_id = #{gradeId}
+        </trim>
+        where reference_id = #{referenceId}
+    </update>
+
+    <delete id="deleteReferenceGradeRelationByReferenceId" parameterType="Long">
+        delete
+        from rt_reference_grade
+        where reference_id = #{referenceId}
+    </delete>
+
+    <delete id="deleteReferenceGradeRelationByReferenceIds" parameterType="String">
+        delete from rt_reference_grade where reference_id in
+        <foreach item="referenceId" collection="array" open="(" separator="," close=")">
+            #{referenceId}
+        </foreach>
+    </delete>
+
+</mapper>

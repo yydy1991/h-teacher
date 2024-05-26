@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.barracuda.barracudateacher.reference.mapper.ReferenceSubjectRelationMapper">
+
+    <resultMap type="ReferenceSubjectRelation" id="ReferenceSubjectRelationResult">
+        <result property="referenceId" column="reference_id"/>
+        <result property="subjectId" column="subject_id"/>
+    </resultMap>
+
+    <sql id="selectReferenceSubjectRelationVo">
+        select reference_id, subject_id
+        from rt_reference_subject
+    </sql>
+
+    <select id="selectReferenceSubjectRelationList" parameterType="ReferenceSubjectRelation"
+            resultMap="ReferenceSubjectRelationResult">
+        <include refid="selectReferenceSubjectRelationVo"/>
+        <where>
+            <if test="referenceId != null ">and reference_id = #{referenceId}</if>
+            <if test="subjectId != null ">and subject_id = #{subjectId}</if>
+        </where>
+    </select>
+
+    <select id="selectReferenceSubjectRelationByReferenceId" parameterType="Long"
+            resultMap="ReferenceSubjectRelationResult">
+        <include refid="selectReferenceSubjectRelationVo"/>
+        where reference_id = #{referenceId}
+    </select>
+
+    <insert id="insertReferenceSubjectRelation" parameterType="ReferenceSubjectRelation">
+        insert into rt_reference_subject
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="referenceId != null">reference_id,</if>
+            <if test="subjectId != null">subject_id,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="referenceId != null">#{referenceId},</if>
+            <if test="subjectId != null">#{subjectId},</if>
+        </trim>
+    </insert>
+
+    <update id="updateReferenceSubjectRelation" parameterType="ReferenceSubjectRelation">
+        update rt_reference_subject
+        <trim prefix="SET" suffixOverrides=",">
+            subject_id = #{subjectId}
+        </trim>
+        where reference_id = #{referenceId}
+    </update>
+
+    <delete id="deleteReferenceSubjectRelationByReferenceId" parameterType="Long">
+        delete
+        from rt_reference_subject
+        where reference_id = #{referenceId}
+    </delete>
+
+    <delete id="deleteReferenceSubjectRelationByReferenceIds" parameterType="String">
+        delete from rt_reference_subject where reference_id in
+        <foreach item="referenceId" collection="array" open="(" separator="," close=")">
+            #{referenceId}
+        </foreach>
+    </delete>
+
+</mapper>
