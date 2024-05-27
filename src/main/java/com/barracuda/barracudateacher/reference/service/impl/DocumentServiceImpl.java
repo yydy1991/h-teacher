@@ -15,6 +15,7 @@ import org.springframework.util.Assert;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -147,5 +148,21 @@ public class DocumentServiceImpl implements IDocumentService {
     public List<Document> listByReferenceId(Long referenceId) {
         Assert.notNull(referenceId, "Reference id is null.");
         return documentMapper.listByReferenceId(referenceId);
+    }
+
+    @Override
+    public Document insertDocument(File file) {
+        String originalFilename = file.getName();
+        // 上传并返回新文件名称
+        String absolutePath = file.getAbsolutePath();
+        long size = file.length();
+        String contentType = "";
+        Document document = new Document();
+        document.setDocumentType(contentType);
+        document.setDocumentSize(size);
+        document.setDocumentAddress(absolutePath);
+        document.setDocumentName(originalFilename);
+        insertDocument(document);
+        return document;
     }
 }

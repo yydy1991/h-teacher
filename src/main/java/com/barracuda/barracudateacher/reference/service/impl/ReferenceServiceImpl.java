@@ -3,14 +3,23 @@ package com.barracuda.barracudateacher.reference.service.impl;
 import com.barracuda.barracudateacher.reference.domain.*;
 import com.barracuda.barracudateacher.reference.mapper.ReferenceMapper;
 import com.barracuda.barracudateacher.reference.service.*;
+import com.barracuda.barracudateacher.tool.FileUtil;
 import com.barracuda.barracudateacher.tool.UserTool;
+import com.barracuda.common.config.BarracudaConfig;
 import com.barracuda.common.core.text.Convert;
 import com.barracuda.common.utils.DateUtils;
+import com.barracuda.common.utils.file.FileUploadUtils;
+import com.barracuda.common.utils.file.FileUtils;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.time.StopWatch;
 import org.springframework.stereotype.Service;
 import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
+import org.springframework.web.multipart.MultipartFile;
 
 import javax.annotation.Resource;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,6 +29,7 @@ import java.util.List;
  *
  * @author barracuda
  */
+@Slf4j
 @Service
 public class ReferenceServiceImpl implements IReferenceService {
     @Resource
@@ -138,8 +148,6 @@ public class ReferenceServiceImpl implements IReferenceService {
 
     /**
      * 查询所有信息
-     *
-     * @param reference
      */
     @Override
     public List<Reference> listAllInfo(Reference reference) {
@@ -192,4 +200,69 @@ public class ReferenceServiceImpl implements IReferenceService {
         }
         return documents;
     }
+
+    /**
+     * 初始化资料
+     * 通过文件目录，遍历文件，上传并初始化
+     */
+    @Override
+    public void initReference(ReferenceInit referenceInit) {
+        Assert.notNull(referenceInit, "referenceInit is null");
+        String fileMenu = referenceInit.getFileMenu();
+        Assert.notNull(fileMenu, "fileMenu is null");
+        StopWatch stopWatch = StopWatch.createStarted();
+
+        log.info("initReference start.fileMenu is :{}", fileMenu);
+        File dir = new File(fileMenu);
+        if (dir.exists()) {
+            List<File> files = FileUtil.listFilesRecursively(dir);
+            List<File> allowUploadedFiles = listAllowUploadedFiles(files);
+            Long gradeId = referenceInit.getGradeId();
+            Long subjectId = referenceInit.getSubjectId();
+
+
+            StopWatch eachFileStopWatch = StopWatch.createStarted();
+            for (File file : allowUploadedFiles) {
+                Document document = documentService.insertDocument(file);
+                Long documentId = document.getId();
+                String referenceTitle = getReferenceTitle(file);
+                Reference reference = new Reference();
+                reference.setReferenceTitle(referenceTitle);
+                reference.setGradeId(gradeId);
+                reference.setSubjectId(subjectId);
+                addSave(reference, new Long[]{documentId});
+                log.info("add save one reference:{},use time {}ms", referenceTitle, eachFileStopWatch.getTime());
+                eachFileStopWatch.reset();
+                eachFileStopWatch.start();
+            }
+        }
+        log.info("initReference end. use time {}ms.", stopWatch.getTime());
+    }
+
+    private String getReferenceTitle(File file) {
+        String originalFilename = file.getName();
+        String fileName = FileUtils.getName(originalFilename);
+        return fileName.substring(0, fileName.indexOf("."));
+    }
+
+    /**
+     * 获取允许上传的文件
+     */
+    private List<File> listAllowUploadedFiles(List<File> files) {
+        List<File> result = new ArrayList<>();
+        for (File file : files) {
+            String fileName = file.getName();
+            boolean validFilename = FileUtils.isValidFilename(fileName);
+            boolean allowDownload = FileUtils.checkAllowDownload(fileName);
+            if (validFilename && allowDownload) {
+                result.add(file);
+            } else {
+                log.info("file is {}", file.getAbsolutePath());
+                log.info("file name is {}", fileName);
+                log.info("file is not allow upload.");
+            }
+        }
+        return result;
+    }
+
 }

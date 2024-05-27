@@ -6,8 +6,36 @@
 </head>
 <body class="white-bg">
 <div class="wrapper wrapper-content animated fadeInRight ibox-content">
-    <form class="form-horizontal m" id="form-reference-add">
-
+    <form class="form-horizontal m" id="form-reference-init">
+        <div class="form-group">
+            <label for="fileMenu" class="col-sm-3 control-label is-required">文件目录：</label>
+            <div class="col-sm-9 no-padding">
+                <input id="fileMenu" required name="fileMenu"
+                       class="form-control" type="text">
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="subjectId" class="col-sm-3 control-label">学科：</label>
+            <div class="col-sm-9 no-padding">
+                <select class="form-control" id="subjectId" name="subjectId"
+                        th:with="subjects=${@subject.list()}">
+                    <option value="">请选择</option>
+                    <option th:each="subject : ${subjects}" th:text="${subject.subjectName}"
+                            th:value="${subject.id}"></option>
+                </select>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="gradeId" class="col-sm-3 control-label">年级：</label>
+            <div class="col-sm-9 no-padding">
+                <select class="form-control" id="gradeId" name="gradeId"
+                        th:with="grades=${@grade.list()}">
+                    <option value="">请选择</option>
+                    <option th:each="grade : ${grades}" th:text="${grade.gradeName}"
+                            th:value="${grade.id}"></option>
+                </select>
+            </div>
+        </div>
     </form>
 </div>
 <th:block th:include="include :: footer"/>
@@ -15,6 +43,9 @@
 <script th:inline="javascript">
     let prefix = ctx + "reference/reference"
 
+    function submitHandler() {
+        $.operate.save(prefix + "/initReference", $('#form-reference-init').serialize());
+    }
 </script>
 </body>
 </html>

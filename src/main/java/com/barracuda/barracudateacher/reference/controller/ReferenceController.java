@@ -2,10 +2,12 @@ package com.barracuda.barracudateacher.reference.controller;
 
 import com.barracuda.barracudateacher.reference.domain.Document;
 import com.barracuda.barracudateacher.reference.domain.Reference;
+import com.barracuda.barracudateacher.reference.domain.ReferenceInit;
 import com.barracuda.barracudateacher.reference.service.IReferenceService;
 import com.barracuda.common.annotation.Log;
 import com.barracuda.common.core.controller.BaseController;
 import com.barracuda.common.core.domain.AjaxResult;
+import com.barracuda.common.core.domain.R;
 import com.barracuda.common.core.page.TableDataInfo;
 import com.barracuda.common.enums.BusinessType;
 import com.barracuda.common.utils.poi.ExcelUtil;
@@ -33,13 +35,6 @@ public class ReferenceController extends BaseController {
     @GetMapping()
     public String reference() {
         return "reference/reference/reference";
-    }
-
-
-    @RequiresPermissions("reference:reference:init")
-    @GetMapping("/openInitReference")
-    public String openInitReference() {
-        return "reference/reference/init";
     }
 
     /**
@@ -123,5 +118,19 @@ public class ReferenceController extends BaseController {
     @ResponseBody
     public AjaxResult remove(String ids) {
         return toAjax(referenceService.deleteReferenceByIds(ids));
+    }
+
+    @RequiresPermissions("reference:reference:init")
+    @GetMapping("/openInitReference")
+    public String openInitReference() {
+        return "reference/reference/init";
+    }
+
+    @PostMapping("/initReference")
+    @ResponseBody
+    public AjaxResult initReference(ReferenceInit referenceInit) {
+        Thread thread = new Thread(() -> referenceService.initReference(referenceInit));
+        thread.start();
+        return AjaxResult.success();
     }
 }

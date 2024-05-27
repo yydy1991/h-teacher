@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.barracuda.barracudateacher.reference.domain.Document;
 import com.barracuda.barracudateacher.reference.domain.Reference;
+import com.barracuda.barracudateacher.reference.domain.ReferenceInit;
 
 /**
  * 参考资料Service接口
@@ -81,4 +82,10 @@ public interface IReferenceService {
      * @param referenceId 资料Id
      */
     List<Document> listDocuments(Long referenceId);
+
+    /**
+     * 初始化资料
+     * 通过文件目录，遍历文件，上传并初始化
+     */
+    void initReference(ReferenceInit referenceInit);
 }

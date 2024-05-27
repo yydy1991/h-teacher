@@ -1,5 +1,6 @@
 package com.barracuda.barracudateacher.reference.service;
 
+import java.io.File;
 import java.util.List;
 
 import com.barracuda.barracudateacher.reference.domain.Document;
@@ -73,4 +74,6 @@ public interface IDocumentService {
      * @param referenceId 参考资料ID
      */
     List<Document> listByReferenceId(Long referenceId);
+
+    Document insertDocument(File file);
 }
