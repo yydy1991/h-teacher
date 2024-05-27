@@ -60,6 +60,9 @@
             <a class="btn btn-warning" onclick="$.table.exportExcel()" shiro:hasPermission="reference:reference:export">
                 <i class="fa fa-download"></i> 导出
             </a>
+            <a class="btn btn-success" onclick="openInitReference()" shiro:hasPermission="reference:reference:init">
+                <i class="fa fa-check"></i> 初始化
+            </a>
         </div>
         <div class="col-sm-12 select-table table-striped">
             <table id="bootstrap-table"></table>
@@ -67,6 +70,7 @@
     </div>
 </div>
 <th:block th:include="include :: footer"/>
+<script th:src="@{/barracuda/js/reference.js}"></script>
 <script th:inline="javascript">
     var editFlag = [[${@permission.hasPermi('reference:reference:edit')}]];
     var removeFlag = [[${@permission.hasPermi('reference:reference:remove')}]];
@@ -74,8 +78,6 @@
 
     let subjects = [[${@subject.list()}]];
     let grades = [[${@grade.list()}]];
-
-    console.log({subjects, grades});
 
     $(function () {
 

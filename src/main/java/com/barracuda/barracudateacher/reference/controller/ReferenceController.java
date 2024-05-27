@@ -2,8 +2,7 @@ package com.barracuda.barracudateacher.reference.controller;
 
 import com.barracuda.barracudateacher.reference.domain.Document;
 import com.barracuda.barracudateacher.reference.domain.Reference;
-import com.barracuda.barracudateacher.reference.domain.ReferenceDocumentRelation;
-import com.barracuda.barracudateacher.reference.service.*;
+import com.barracuda.barracudateacher.reference.service.IReferenceService;
 import com.barracuda.common.annotation.Log;
 import com.barracuda.common.core.controller.BaseController;
 import com.barracuda.common.core.domain.AjaxResult;
@@ -16,8 +15,6 @@ import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,21 +29,17 @@ public class ReferenceController extends BaseController {
     @Resource
     private IReferenceService referenceService;
 
-    @Resource
-    private IDocumentService documentService;
-
-    @Resource
-    private IReferenceDocumentRelationService referenceDocumentRelationService;
-
-    @Resource
-    private IReferenceSubjectRelationService referenceSubjectRelationService;
-    @Resource
-    private IReferenceGradeRelationService referenceGradeRelationService;
-
     @RequiresPermissions("reference:reference:view")
     @GetMapping()
     public String reference() {
         return "reference/reference/reference";
+    }
+
+
+    @RequiresPermissions("reference:reference:init")
+    @GetMapping("/openInitReference")
+    public String openInitReference() {
+        return "reference/reference/init";
     }
 
     /**
@@ -90,11 +83,7 @@ public class ReferenceController extends BaseController {
     @PostMapping("/add")
     @ResponseBody
     public AjaxResult addSave(Reference reference, Long[] documentIds) {
-        referenceService.insertReference(reference);
-        if (documentIds != null && documentIds.length > 0) {
-            List<Long> list = Arrays.asList(documentIds);
-            referenceDocumentRelationService.insertReferenceDocumentRelation(reference.getId(), list);
-        }
+        referenceService.addSave(reference, documentIds);
         return AjaxResult.success();
     }
 
@@ -107,15 +96,7 @@ public class ReferenceController extends BaseController {
         Reference reference = referenceService.getReference(id);
         referenceService.setProjectId(reference);
         referenceService.setGradeId(reference);
-        ReferenceDocumentRelation referenceDocumentRelation = new ReferenceDocumentRelation();
-        referenceDocumentRelation.setRefReferenceId(id);
-        List<ReferenceDocumentRelation> referenceDocumentRelations = referenceDocumentRelationService.selectReferenceDocumentRelationList(referenceDocumentRelation);
-        List<Document> documents = new ArrayList<>();
-        for (ReferenceDocumentRelation documentRelation : referenceDocumentRelations) {
-            Long documentId = documentRelation.getRefDocumentId();
-            Document document = documentService.selectDocumentById(documentId);
-            documents.add(document);
-        }
+        List<Document> documents = referenceService.listDocuments(id);
         mmap.put("documents", documents);
         mmap.put("reference", reference);
         return "reference/reference/edit";
@@ -129,10 +110,7 @@ public class ReferenceController extends BaseController {
     @PostMapping("/edit")
     @ResponseBody
     public AjaxResult editSave(Reference reference, Long[] documentIds) {
-        int i = referenceService.updateReference(reference);
-        referenceDocumentRelationService.updateNewestRelation(reference.getId(), documentIds);
-        referenceSubjectRelationService.updateNewestRelation(reference.getId(), reference.getSubjectId());
-        referenceGradeRelationService.updateNewestRelation(reference.getId(), reference.getGradeId());
+        int i = referenceService.editSave(reference, documentIds);
         return toAjax(i);
     }
 

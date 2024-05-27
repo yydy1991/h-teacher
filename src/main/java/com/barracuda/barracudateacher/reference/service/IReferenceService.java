@@ -2,6 +2,7 @@ package com.barracuda.barracudateacher.reference.service;
 
 import java.util.List;
 
+import com.barracuda.barracudateacher.reference.domain.Document;
 import com.barracuda.barracudateacher.reference.domain.Reference;
 
 /**
@@ -69,4 +70,15 @@ public interface IReferenceService {
      * 查询所有信息
      */
     List<Reference> listAllInfo(Reference reference);
+
+    void addSave(Reference reference, Long[] documentIds);
+
+    int editSave(Reference reference, Long[] documentIds);
+
+    /**
+     * 查询附件
+     *
+     * @param referenceId 资料Id
+     */
+    List<Document> listDocuments(Long referenceId);
 }

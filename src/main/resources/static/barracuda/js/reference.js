@@ -79,3 +79,8 @@ function initSummernoteOfEditPage() {
         $('#' + this.id).summernote('code', content);
     })
 }
+
+// 初始化资料
+function openInitReference() {
+    $.modal.open("初始化资料", ctx + "reference/reference/openInitReference")
+}

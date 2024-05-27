@@ -1,12 +1,8 @@
 package com.barracuda.barracudateacher.reference.service.impl;
 
-import com.barracuda.barracudateacher.reference.domain.Reference;
-import com.barracuda.barracudateacher.reference.domain.ReferenceGradeRelation;
-import com.barracuda.barracudateacher.reference.domain.ReferenceSubjectRelation;
+import com.barracuda.barracudateacher.reference.domain.*;
 import com.barracuda.barracudateacher.reference.mapper.ReferenceMapper;
-import com.barracuda.barracudateacher.reference.service.IReferenceGradeRelationService;
-import com.barracuda.barracudateacher.reference.service.IReferenceService;
-import com.barracuda.barracudateacher.reference.service.IReferenceSubjectRelationService;
+import com.barracuda.barracudateacher.reference.service.*;
 import com.barracuda.barracudateacher.tool.UserTool;
 import com.barracuda.common.core.text.Convert;
 import com.barracuda.common.utils.DateUtils;
@@ -15,6 +11,8 @@ import org.springframework.util.Assert;
 import org.springframework.util.CollectionUtils;
 
 import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -32,6 +30,12 @@ public class ReferenceServiceImpl implements IReferenceService {
 
     @Resource
     private IReferenceGradeRelationService referenceGradeRelationService;
+
+    @Resource
+    private IReferenceDocumentRelationService referenceDocumentRelationService;
+
+    @Resource
+    private IDocumentService documentService;
 
     /**
      * 查询参考资料
@@ -140,5 +144,52 @@ public class ReferenceServiceImpl implements IReferenceService {
     @Override
     public List<Reference> listAllInfo(Reference reference) {
         return referenceMapper.listAllInfo(reference);
+    }
+
+    @Override
+    public void addSave(Reference reference, Long[] documentIds) {
+        insertReference(reference);
+        Long referenceId = reference.getId();
+        if (documentIds != null && documentIds.length > 0) {
+            List<Long> list = Arrays.asList(documentIds);
+            referenceDocumentRelationService.insertReferenceDocumentRelation(referenceId, list);
+        }
+        Long subjectId = reference.getSubjectId();
+        if (subjectId != null) {
+            referenceSubjectRelationService.updateNewestRelation(referenceId, subjectId);
+        }
+        Long gradeId = reference.getGradeId();
+        if (gradeId != null) {
+            referenceGradeRelationService.updateNewestRelation(referenceId, gradeId);
+        }
+    }
+
+
+    @Override
+    public int editSave(Reference reference, Long[] documentIds) {
+        int i = updateReference(reference);
+        referenceDocumentRelationService.updateNewestRelation(reference.getId(), documentIds);
+        referenceSubjectRelationService.updateNewestRelation(reference.getId(), reference.getSubjectId());
+        referenceGradeRelationService.updateNewestRelation(reference.getId(), reference.getGradeId());
+        return i;
+    }
+
+    /**
+     * 查询附件
+     *
+     * @param referenceId 资料Id
+     */
+    @Override
+    public List<Document> listDocuments(Long referenceId) {
+        ReferenceDocumentRelation referenceDocumentRelation = new ReferenceDocumentRelation();
+        referenceDocumentRelation.setRefReferenceId(referenceId);
+        List<ReferenceDocumentRelation> referenceDocumentRelations = referenceDocumentRelationService.selectReferenceDocumentRelationList(referenceDocumentRelation);
+        List<Document> documents = new ArrayList<>();
+        for (ReferenceDocumentRelation documentRelation : referenceDocumentRelations) {
+            Long documentId = documentRelation.getRefDocumentId();
+            Document document = documentService.selectDocumentById(documentId);
+            documents.add(document);
+        }
+        return documents;
     }
 }
